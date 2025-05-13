@@ -52,7 +52,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Add in the relative sounds path
     let all_files: Vec<String> = all_files
         .into_iter()
-        .map(|path| format!("Sounds/{}", path))
+        .map(|path| format!("sounds/{}", path))
         .collect();
 
     // Serialize and write
