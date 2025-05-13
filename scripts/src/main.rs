@@ -1,20 +1,42 @@
 #![recursion_limit = "512"]
+
 use anyhow::Result;
+use html::content::*;
 use html::media::Audio;
-use html::text_content::UnorderedList;
+use html::text_content::*;
 use std::error::Error;
 use std::fs;
+
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut unordered_list = UnorderedList::builder();
+    // Create the <ul> builder
+    let mut ul = UnorderedList::builder();
 
-    let audio_files = fs::read_dir("../../sounds")?;
+    let mut count = 0;
+    for entry in fs::read_dir("/Users/philocalyst/Downloads/OSS-Soundboard/sounds")? {
+        let entry = entry?;
+        // Owned Strings so we can move them into the closures
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let src = entry.path().to_string_lossy().into_owned();
 
-    for audio_file in audio_files {
-        audio_file.expect("Shouldn't every entry exist if the directory exists?");
+        // While testing keeping 100
+        if count > 100 {
+            break;
+        }
 
-        unordered_list.list_item(|li| li.text(audio_file));
+        let audio_element = Audio::builder()
+            .src(src.clone())
+            .controls("") // Initialize controls
+            .preload("") // No preload
+            .build();
+
+        ul.list_item(|li| li.push(audio_element));
+
+        count += 1;
     }
-    let string = tree.to_string();
-    println!("{string}");
+
+    // Finish and render
+    let tree = ul.build();
+    println!("{}", tree.to_string());
+
     Ok(())
 }
